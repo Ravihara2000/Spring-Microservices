@@ -1,2 +1,2 @@
 # Spring-Microservices
-This repo is created for learning microservices with spring cloud. I created two services for department and employee
+This repo is created for learning microservices with Spring Cloud. I created two separate services for Department and Employee.
