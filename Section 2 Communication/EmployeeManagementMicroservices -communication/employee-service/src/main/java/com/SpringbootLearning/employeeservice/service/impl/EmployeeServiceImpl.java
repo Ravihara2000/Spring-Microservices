@@ -5,6 +5,7 @@ import com.SpringbootLearning.employeeservice.dto.DepartmentDto;
 import com.SpringbootLearning.employeeservice.dto.EmployeeDto;
 import com.SpringbootLearning.employeeservice.entity.Employee;
 import com.SpringbootLearning.employeeservice.repository.EmployeeRepository;
+import com.SpringbootLearning.employeeservice.service.APIClient;
 import com.SpringbootLearning.employeeservice.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private EmployeeRepository employeeRepository;
     /*private RestTemplate restTemplate;*/
-    private WebClient webClient;
+   /* private WebClient webClient;*/
+    private APIClient apiClient;
 
     @Override
     public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
@@ -53,11 +55,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         DepartmentDto departmentDto = responseEntity.getBody();*/
 
         //communication with web client
-        DepartmentDto departmentDto=webClient.get()
+/*        DepartmentDto departmentDto=webClient.get()
                 .uri("http://localhost:8080/api/departments/"+employee.getDepartmentCode())
                 .retrieve()
                 .bodyToMono(DepartmentDto.class)
-                .block();
+                .block();*/
+
+//communication with spring cloud (FeignClient)
+        DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
 
         EmployeeDto employeeDto = new EmployeeDto(
                 employee.getId(),
