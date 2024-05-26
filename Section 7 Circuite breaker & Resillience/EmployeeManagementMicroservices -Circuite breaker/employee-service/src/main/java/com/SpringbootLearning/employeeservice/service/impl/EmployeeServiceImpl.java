@@ -9,6 +9,8 @@ import com.SpringbootLearning.employeeservice.service.APIClient;
 import com.SpringbootLearning.employeeservice.service.EmployeeService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +19,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
     private EmployeeRepository employeeRepository;
     /*private RestTemplate restTemplate;*/
@@ -48,6 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @CircuitBreaker(name = "${spring.application.name}",fallbackMethod = "getDefaultDepartment")
     @Override
     public ApiResponseDto getEmployeeById(Long id) {
+      LOGGER.info("Inside getEmployeeById method");
         Employee employee = employeeRepository.findById(id).get();
 //communication with rest template
 /*        ResponseEntity<DepartmentDto> responseEntity=restTemplate.
@@ -79,5 +84,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         apiResponseDto.setDepartmentDto(departmentDto);
         return apiResponseDto;
     }
-    
+
+
+
+    public ApiResponseDto getDefaultDepartment(Long id,Exception exception) {
+        LOGGER.info("Inside getDefaultDepartment method");
+        Employee employee = employeeRepository.findById(id).get();
+
+        DepartmentDto departmentDto=new DepartmentDto();
+        departmentDto.setDepartmentName("Default Department");
+        departmentDto.setDepartmentCode("D001");
+        departmentDto.setDepartmentDescription("Development Department");
+
+        EmployeeDto employeeDto = new EmployeeDto(
+                employee.getId(),
+                employee.getFirstname(),
+                employee.getLastname(),
+                employee.getEmail(),
+                employee.getDepartmentCode()
+        );
+
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setEmployeeDto(employeeDto);
+        apiResponseDto.setDepartmentDto(departmentDto);
+        return apiResponseDto;
+    }
 }
